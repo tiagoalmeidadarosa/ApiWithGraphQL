@@ -22,6 +22,8 @@ builder.Services.AddSingleton<IGraphQLTextSerializer, GraphQL.SystemTextJson.Gra
 
 var app = builder.Build();
 
+CreateDatabase(app);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -39,3 +41,10 @@ app.UseGraphQLPlayground("/playground");
 app.MapControllers();
 
 app.Run();
+
+static void CreateDatabase(WebApplication app)
+{
+    var serviceScope = app.Services.CreateScope();
+    var dataContext = serviceScope.ServiceProvider.GetService<AppDbContext>();
+    dataContext?.Database.EnsureCreated();
+}

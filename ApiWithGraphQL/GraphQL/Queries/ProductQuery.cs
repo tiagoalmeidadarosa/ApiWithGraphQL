@@ -8,8 +8,6 @@ namespace ApiWithGraphQL.GraphQL.Queries
     {
         public ProductQuery(AppDbContext dbContext)
         {
-            dbContext.Database.EnsureCreated();
-
             FieldAsync<ListGraphType<ProductType>>(
                 name: "products",
                 arguments: null,

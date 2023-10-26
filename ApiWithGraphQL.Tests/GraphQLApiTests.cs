@@ -12,7 +12,7 @@ namespace ApiWithGraphQL.Tests
 {
     public class GraphQLApiTests
     {
-        private readonly IServiceProvider _resolver;
+        private readonly IServiceProvider _serviceProvider;
         private JsonSerializerOptions _jsonSerializerOptions;
 
         public GraphQLApiTests()
@@ -27,10 +27,12 @@ namespace ApiWithGraphQL.Tests
             services.AddSingleton<IGraphQLTextSerializer, GraphQLSerializer>();
 
             // Build the dependency resolver
-            _resolver = services.BuildServiceProvider();
+            _serviceProvider = services.BuildServiceProvider();
 
             // Register any dependencies needed for your API
-            services.AddScoped(s => _resolver);
+            services.AddScoped(s => _serviceProvider);
+
+            CreateDatabase();
 
             _jsonSerializerOptions = new JsonSerializerOptions
             {
@@ -39,11 +41,17 @@ namespace ApiWithGraphQL.Tests
             };
         }
 
+        private void CreateDatabase()
+        {
+            var dataContext = _serviceProvider.GetService<AppDbContext>();
+            dataContext?.Database.EnsureCreated();
+        }
+
         [Fact]
         public async Task ProductQuery_ReturnsProductsWithoutCategory()
         {
             // Arrange
-            var schema = new ProductSchema(_resolver);
+            var schema = new ProductSchema(_serviceProvider);
             var query = @"{ products { name description price imageUrl stock date } }";
 
             // Act
@@ -64,7 +72,7 @@ namespace ApiWithGraphQL.Tests
         public async Task ProductQuery_ReturnsProductsWithCategory()
         {
             // Arrange
-            var schema = new ProductSchema(_resolver);
+            var schema = new ProductSchema(_serviceProvider);
             var query = @"{ products { name description price imageUrl stock date category { name imageUrl } } }";
 
             // Act
@@ -85,7 +93,7 @@ namespace ApiWithGraphQL.Tests
         public async Task ProductQuery_ReturnsError()
         {
             // Arrange
-            var schema = new ProductSchema(_resolver);
+            var schema = new ProductSchema(_serviceProvider);
             var query = @"{ products { xxx }";
 
             // Act

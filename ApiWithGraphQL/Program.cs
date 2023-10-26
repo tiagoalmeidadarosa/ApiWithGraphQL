@@ -13,10 +13,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(databaseName: "GraphQlExample"));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(databaseName: "GraphQlExample"));
 
-builder.Services.AddScoped<RootQuery>();
-builder.Services.AddScoped<RootSchema>();
+builder.Services.AddScoped<ProductQuery>();
+builder.Services.AddScoped<ProductSchema>();
 builder.Services.AddGraphQL(options => options.AddGraphTypes());
 builder.Services.AddSingleton<IGraphQLTextSerializer, GraphQL.SystemTextJson.GraphQLSerializer>();
 
@@ -33,7 +33,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseGraphQL<RootSchema>();
+app.UseGraphQL<ProductSchema>();
 app.UseGraphQLPlayground("/playground");
 
 app.MapControllers();
